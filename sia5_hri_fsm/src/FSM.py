@@ -49,8 +49,8 @@ class ExaminePuzzle(smach.State):
         global possiblePatterns
         possiblePatterns = comparePattern(currentPattern, possiblePatterns)
         numSolns = len(possiblePatterns)
-        if nextBlock(possiblePatterns) != '0':
-            userdata.next_block = nextBlock(possiblePatterns) # Write the next likely block
+        if nextBlock(possiblePatterns, currentPattern) != '0':
+            userdata.next_block = nextBlock(possiblePatterns, currentPattern) # Write the next likely block
             # TODO: check to see if user has a block in his/her workspace. i.e.
             # do we need to go to give block?
         if (numSolns == 1):

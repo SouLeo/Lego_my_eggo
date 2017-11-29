@@ -38,11 +38,11 @@ class ExaminePuzzle(smach.State):
 
     def execute(self, userdata):
         rospy.loginfo('Executing Examine Puzzle State')
+        global possiblePatterns
         # TODO: rosservice call that reports block sequence into a string and
         # report into currentPattern
         currentPattern = 'rr'   # example pattern. replace with a rosservice that determines what blocks are shown
         if not userdata.is_pattern_known:
-            global possiblePatterns
             possiblePatterns = comparePattern(currentPattern, possiblePatterns)
             numSolns = len(possiblePatterns)
             # TODO: check to see if user has a block in his/her workspace. i.e.

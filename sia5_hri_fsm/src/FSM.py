@@ -9,7 +9,6 @@ import smach_ros
 from Puzzle import createPatterns, comparePattern, nextBlock
 from std_msgs.msg import Bool, Int32
 
-# TODO: Modularize FSM functionality.
 # TODO: Replace services and topics into service and topic states in SMACH
 # TODO: Do variable reset for variables that switch states
 
@@ -18,7 +17,7 @@ possiblePatterns = []
 
 class Observe(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes=['examine_puzzle','give_block'], input_keys=['is_block_placed_in', 'is_pattern_known'], output_keys=['is_block_placed_out'])
+        smach.State.__init__(self, outcomes=['examine_puzzle'], input_keys=['is_block_placed_in', 'is_pattern_known'], output_keys=[''])
 
     def execute(self, userdata):
         rospy.loginfo('Executing Observation State')
@@ -30,12 +29,9 @@ class Observe(smach.State):
             rospy.loginfo('Timeout Occurred') 
             userdata.is_block_placed_out = False
             return 'give_block'
+        # userdata.is_block_placed_in = False # resets state variable
         rospy.loginfo('Block in place') 
-        userdata.is_block_placed_out = True
-        if userdata.is_pattern_known:
-            return 'give_block'
-        else: 
-            return 'examine_puzzle'
+        return 'examine_puzzle'
 
 class ExaminePuzzle(smach.State):
     def __init__(self):
@@ -49,20 +45,20 @@ class ExaminePuzzle(smach.State):
         global possiblePatterns
         possiblePatterns = comparePattern(currentPattern, possiblePatterns)
         numSolns = len(possiblePatterns)
-        if nextBlock(possiblePatterns, currentPattern) != '0':
-            userdata.next_block = nextBlock(possiblePatterns, currentPattern) # Write the next likely block
-            # TODO: check to see if user has a block in his/her workspace. i.e.
-            # do we need to go to give block?
+        userdata.next_block = nextBlock(possiblePatterns, currentPattern) # Write the next likely block
+        # TODO: check to see if user has a block in his/her workspace. i.e.
+        # do we need to go to give block?
         if (numSolns == 1):
             rospy.loginfo('Pattern Known!! :D')
             userdata.is_pattern_known = True
         else:
-            rospy.loginfo('Pattern still unknown.' + str(numSolns) + 'possibilities')
-            userdata.is_pattern_known = False
+            rospy.loginfo('Pattern still unknown. ' + str(numSolns) + ' possibilities')
         return 'give_next_block'
 
 class GiveBlock(smach.State):
-    # TODO: this state involves placing a block in the handover zone, the robot
+    # TODO: this state involves placing a block in the handover zone, the robot,
+    # this may turn into a service state type or an action state type. Talk w/
+    # Christina
     def __init__(self):
         smach.State.__init__(self, outcomes=['observe'], input_keys=['is_pattern_known', 'next_block'], output_keys=['is_block_placed_in'])
 
@@ -78,7 +74,7 @@ def is_block_placed_cb(data):
 def main():
     # Set up ROS functionality
     rospy.init_node('sia5_fsm')
-    # TODO: ROS publisher and subscribers
+    # ROS publisher and subscribers
     rospy.Subscriber('is_block_placed', Bool, is_block_placed_cb)
 
     # State Machine Setup
@@ -96,9 +92,9 @@ def main():
    
     with sm:
         # Add states to container
-        smach.StateMachine.add('OBSERVE', Observe(), transitions={'give_block':'GIVEBLOCK','examine_puzzle':'EXAMINEPUZZLE'}, remapping={'is_block_placed_in':'sm_is_block_placed', 'is_block_placed_out':'sm_is_block_placed', 'is_pattern_known':'sm_is_pattern_known'})
+        smach.StateMachine.add('OBSERVE', Observe(), transitions={'examine_puzzle':'EXAMINEPUZZLE'}, remapping={'is_block_placed_in':'sm_is_block_placed', 'is_pattern_known':'sm_is_pattern_known'})
         smach.StateMachine.add('EXAMINEPUZZLE', ExaminePuzzle(), transitions={'give_next_block':'GIVEBLOCK'}, remapping={'is_block_placed_out':'sm_is_block_placed','is_pattern_known':'sm_is_pattern_known', 'next_block':'sm_next_block' })
-        smach.StateMachine.add('GIVEBLOCK', GiveBlock(), transitions={'observe':'OBSERVE'}, remapping={'is_pattern_known':'sm_is_pattern_known','next_block':'sm_next_block', 'is_block_placed)in':'sm_is_block_placed'})
+        smach.StateMachine.add('GIVEBLOCK', GiveBlock(), transitions={'observe':'OBSERVE'}, remapping={'is_pattern_known':'sm_is_pattern_known','next_block':'sm_next_block', 'is_block_placed_in':'sm_is_block_placed'})
 
     sis = smach_ros.IntrospectionServer('sia5_fsm', sm, '/SM_ROOT')
     sis.start()

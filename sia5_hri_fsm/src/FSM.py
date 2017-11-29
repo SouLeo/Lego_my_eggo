@@ -10,7 +10,7 @@ from Puzzle import createPatterns, comparePattern, nextBlock
 from std_msgs.msg import Bool, Int32
 
 # TODO: Replace services and topics into service and topic states in SMACH
-# TODO: Do variable reset for variables that switch states
+# TODO: Reformat to 80 tw when I don't hate life
 
 TIMEOUT_SECS = 30
 possiblePatterns = []
@@ -29,7 +29,6 @@ class Observe(smach.State):
             rospy.loginfo('Timeout Occurred') 
             userdata.is_block_placed_out = False
             return 'give_block'
-        # userdata.is_block_placed_in = False # resets state variable
         rospy.loginfo('Block in place') 
         return 'examine_puzzle'
 

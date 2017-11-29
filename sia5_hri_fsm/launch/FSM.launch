@@ -1,0 +1,12 @@
+<launch>
+    <node
+        name    = "FSM"
+        pkg     = "sia5_hri_fsm"
+        type    = "FSM.py"
+        args    = ""
+
+        respawn = "false"
+        output  = "screen"
+    />
+
+</launch>

@@ -9,7 +9,7 @@ from Puzzle import createPatterns, comparePattern, nextBlock
 from std_msgs.msg import Bool, Int32
 
 # TODO: Replace services and topics into service and topic states in SMACH
-# TODO: Reformat to 80 tw when I don't hate life
+# TODO: Reformat to 100 tw when I don't hate life
 
 TIMEOUT_SECS = 30
 NUMERRGUESS = 0
@@ -22,7 +22,6 @@ class Observe(smach.State):
 
     def execute(self, userdata):
         rospy.loginfo('Executing Observation State')
-        global TIMEOUT_SECS
         timeout = rospy.Time.now() + rospy.Duration(TIMEOUT_SECS)
         while not userdata.is_block_placed_in and rospy.Time.now() <= timeout:
             pass
@@ -109,14 +108,16 @@ def main():
 
     with sm:
         # Add states to container
-        smach.StateMachine.add('OBSERVE', Observe(), transitions={'examine_puzzle':'EXAMINEPUZZLE'},
+        smach.StateMachine.add('OBSERVE', Observe(),
+                               transitions={'examine_puzzle':'EXAMINEPUZZLE'},
                                remapping={'is_block_placed_in':'sm_is_block_placed'})
         smach.StateMachine.add('EXAMINEPUZZLE', ExaminePuzzle(),
                                transitions={'give_next_block':'GIVEBLOCK'},
                                remapping={'is_block_placed_out':'sm_is_block_placed',
                                           'is_pattern_known':'sm_is_pattern_known',
                                           'next_block':'sm_next_block'})
-        smach.StateMachine.add('GIVEBLOCK', GiveBlock(), transitions={'observe':'OBSERVE'},
+        smach.StateMachine.add('GIVEBLOCK', GiveBlock(),
+                               transitions={'observe':'OBSERVE'},
                                remapping={'is_pattern_known':'sm_is_pattern_known',
                                           'next_block':'sm_next_block',
                                           'is_block_placed_in':'sm_is_block_placed'})
@@ -124,7 +125,7 @@ def main():
     sis = smach_ros.IntrospectionServer('sia5_fsm', sm, '/SM_ROOT')
     sis.start()
 
-    outcome = sm.execute()
+    sm.execute()
     rospy.spin()
     sis.stop()
 

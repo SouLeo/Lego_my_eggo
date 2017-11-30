@@ -46,8 +46,6 @@ class ExaminePuzzle(smach.State):
         if not userdata.is_pattern_known:
             possiblePatterns = comparePattern(currentPattern, possiblePatterns)
             numSolns = len(possiblePatterns)
-            # TODO: check to see if user has a block in his/her workspace. i.e.
-            # do we need to go to give block?
             if (numSolns == 1):
                 rospy.loginfo('Pattern Discovered!')
                 userdata.is_pattern_known = True
@@ -74,7 +72,11 @@ class GiveBlock(smach.State):
 
     def execute(self, userdata):
         rospy.loginfo('Executing Give Block State')
-        # TODO: rosservice call to place a the next block in the drop off zone
+        if userdata.next_block == '':
+            # Don't hand anything over, the user has his/her block
+        else:
+            # Place block
+            # TODO: rosservice call to place a the next block in the drop off zone
         return 'observe'
 
 def is_block_placed_cb(data):

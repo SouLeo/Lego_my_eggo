@@ -40,6 +40,9 @@ def comparePattern(currentPattern, possiblePatterns):
     return newPossibliities
 
 def nextBlock(possiblePatterns, currentPattern, numTries = None):
+    # TODO: check to see if user has a block in his/her workspace. i.e.
+    # do we need to go to give block?
+    
     # Function: nextBlock
     # Description: Chooses which block should be tried next
     # Input: possiblePatterns (string array), currentPattern (string)

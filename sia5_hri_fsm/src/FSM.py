@@ -13,6 +13,7 @@ from std_msgs.msg import Bool, Int32
 # TODO: Reformat to 80 tw when I don't hate life
 
 TIMEOUT_SECS = 30
+NUMERRGUESS = 0
 possiblePatterns = []
 
 class Observe(smach.State):
@@ -27,9 +28,8 @@ class Observe(smach.State):
             pass    
         if not userdata.is_block_placed_in:
             rospy.loginfo('Timeout Occurred') 
-            userdata.is_block_placed_out = False
-            return 'give_block'
-        rospy.loginfo('Block in place') 
+        else:
+            rospy.loginfo('Block in place') 
         return 'examine_puzzle'
 
 class ExaminePuzzle(smach.State):
@@ -39,6 +39,7 @@ class ExaminePuzzle(smach.State):
     def execute(self, userdata):
         rospy.loginfo('Executing Examine Puzzle State')
         global possiblePatterns
+        global NUMGUESSES
         # TODO: rosservice call that reports block sequence into a string and
         # report into currentPattern
         currentPattern = 'rr'   # example pattern. replace with a rosservice that determines what blocks are shown
@@ -50,11 +51,17 @@ class ExaminePuzzle(smach.State):
             if (numSolns == 1):
                 rospy.loginfo('Pattern Discovered!')
                 userdata.is_pattern_known = True
+                newPiece = nextBlock(possiblePatterns, currentPattern) # Write the next likely block
             else:
                 rospy.loginfo('Pattern still unknown. ' + str(numSolns) + ' possibilities')
+                NUMERRGUESS = NUMERRGUESS + 1
+                # TODO: make another nextBlock function w/ additional param
+                newPiece = nextBlock(possiblePatterns, currentPattern, NUMERRGUESS)
         else:
+            newPiece = nextBlock(possiblePatterns, currentPattern) # Write the next likely block
             rospy.loginfo('Pattern is known!')
-        userdata.next_block = nextBlock(possiblePatterns, currentPattern) # Write the next likely block
+        userdata.next_block = newPiece
+        rospy.loginfo('Giving Block ' + newPiece)
         return 'give_next_block'
 
 

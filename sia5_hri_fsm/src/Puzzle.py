@@ -39,28 +39,39 @@ def comparePattern(currentPattern, possiblePatterns):
             newPossibliities.append(possiblePatterns[i])
     return newPossibliities
 
-def nextBlock(possiblePatterns, currentPattern):
+def nextBlock(possiblePatterns, currentPattern, numTries = None):
     # Function: nextBlock
     # Description: Chooses which block should be tried next
-    # Input: currentPattern (string)
+    # Input: possiblePatterns (string array), currentPattern (string)
     # Output: block which should be tried next
-    firstpossiblePattern = possiblePatterns[0]
     numBlocks = len(currentPattern)
-    if (numBlocks + 1 <= 6):
-        print firstpossiblePattern[numBlocks]
-        return firstpossiblePattern[numBlocks + 1] # return next character
+    if numTries is None:
+        firstpossiblePattern = possiblePatterns[0]
+        if (numBlocks + 1 <= 6):
+            print firstpossiblePattern[numBlocks]
+            return firstpossiblePattern[numBlocks] # return next character
+        else:
+            print "puzzle complete!"
+            print "possible index out of bound"
+            rospy.logerr('Indexed out of bound in the nextBlock() function!!!')
+            return '0' # end of sequence. Something went wrong
     else:
-        print "index out of bound"
-        rospy.logerr('Indexed out of bound in the nextBlock() function!!!')
-        return '0' # end of sequence. Something went wrong
-'''
+        if (numBlocks + 1 <= 6):
+            print possiblePatterns[numTries % len(possiblePatterns)][numBlocks]
+            return possiblePatterns[numTries % len(possiblePatterns)][numBlocks]
+        else:
+            print "puzzle complete!"
+            print "possible index out of bound"
+            rospy.logerr('Indexed out of bound in the nextBlock() function!!!')
+            return '0' # end of sequence. Something went wrong
+'''    
 def main():
     possiblePatterns = []
     possiblePatterns = createPatterns()
-    currentPattern = 'rr'
+    currentPattern = 'bgbgby'
     possiblePatterns = comparePattern(currentPattern, possiblePatterns)
     print possiblePatterns 
-    nextBlock(possiblePatterns, currentPattern)
+    nextBlock(possiblePatterns, currentPattern, 3)
 
 if  __name__ == '__main__':
     main()

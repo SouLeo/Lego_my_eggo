@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 # Maintainer: Selma Wanna, slwanna@utexas.edu
-import roslib
 import rospy
 
 def createPatterns():
@@ -29,20 +28,19 @@ def comparePattern(currentPattern, possiblePatterns):
     # Description: compares currently viewed pattern against possible solutions
     # Input: currentPattern (string), possiblePatterns (list of strings)
     # Output: possible solutions  (list of strings)
-    if (len(possiblePatterns) <= 1):
+    if len(possiblePatterns) <= 1:
         rospy.loginfo('Pattern Known from comparePattern')
-        return possiblePatterns 
+        return possiblePatterns
     endIndex = len(possiblePatterns)
     newPossibliities = []
-    for i in range (0, endIndex):
+    for i in range(0, endIndex):
         if possiblePatterns[i].startswith(currentPattern):
             newPossibliities.append(possiblePatterns[i])
     return newPossibliities
 
-def nextBlock(possiblePatterns, currentPattern, numTries = None):
+def nextBlock(possiblePatterns, currentPattern, numTries=None):
     # TODO: check to see if user has a block in his/her workspace. i.e.
     # do we need to go to give block?
-    
     # Function: nextBlock
     # Description: Chooses which block should be tried next
     # Input: possiblePatterns (string array), currentPattern (string)
@@ -50,7 +48,7 @@ def nextBlock(possiblePatterns, currentPattern, numTries = None):
     numBlocks = len(currentPattern)
     if numTries is None:
         firstpossiblePattern = possiblePatterns[0]
-        if (numBlocks + 1 <= 6):
+        if numBlocks + 1 <= 6:
             print firstpossiblePattern[numBlocks]
             return firstpossiblePattern[numBlocks] # return next character
         else:
@@ -59,7 +57,7 @@ def nextBlock(possiblePatterns, currentPattern, numTries = None):
             rospy.logerr('Indexed out of bound in the nextBlock() function!!!')
             return '0' # end of sequence. Something went wrong
     else:
-        if (numBlocks + 1 <= 6):
+        if numBlocks + 1 <= 6:
             print possiblePatterns[numTries % len(possiblePatterns)][numBlocks]
             return possiblePatterns[numTries % len(possiblePatterns)][numBlocks]
         else:
@@ -67,15 +65,12 @@ def nextBlock(possiblePatterns, currentPattern, numTries = None):
             print "possible index out of bound"
             rospy.logerr('Indexed out of bound in the nextBlock() function!!!')
             return '0' # end of sequence. Something went wrong
-'''    
-def main():
-    possiblePatterns = []
-    possiblePatterns = createPatterns()
-    currentPattern = 'bgbgby'
-    possiblePatterns = comparePattern(currentPattern, possiblePatterns)
-    print possiblePatterns 
-    nextBlock(possiblePatterns, currentPattern, 3)
-
-if  __name__ == '__main__':
-    main()
-'''
+#def main():
+#    possiblePatterns = []
+#    possiblePatterns = createPatterns()
+#    currentPattern = 'bgbgby'
+#    possiblePatterns = comparePattern(currentPattern, possiblePatterns)
+#    print possiblePatterns
+#    nextBlock(possiblePatterns, currentPattern, 3)
+#if  __name__ == '__main__':
+#    main()

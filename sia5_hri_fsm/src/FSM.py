@@ -1,21 +1,35 @@
 #!/usr/bin/env python
+"""
+    This code contains the main function to run the SIA-5 finite state
+    machine for Dr. Thomaz's HRI Project.
 
-# Maintainer: Selma Wanna, slwanna@utexas.edu
+    The state machine is comprised of three states:
+    1. Observe
+    2. ExaminePuzzle
+    3. GiveBlock
+
+    Maintainer: Selma Wanna, slwanna@utexas.edu
+"""
 
 import rospy
 import smach
 import smach_ros
-from Puzzle import createPatterns, comparePattern, nextBlock
+from Puzzle import create_patterns, compare_pattern, next_block
 from std_msgs.msg import Bool, Int32
 
-# TODO: Replace services and topics into service and topic states in SMACH
-# TODO: Reformat to 100 tw when I don't hate life
-
+SM = None
 TIMEOUT_SECS = 30
+RAND = True
 NUMERRGUESS = 0
-possiblePatterns = []
+POSSIBLE_PATTERNS = []
 
 class Observe(smach.State):
+    """
+        The Observation state checks to see if a user has filled in a
+        new block. it will timeout in 30 seconds if no block is placed.
+        Regardless of timeout it will enter the state ExaminePuzzle
+    """
+
     def __init__(self):
         smach.State.__init__(self,
                              outcomes=['examine_puzzle'],
@@ -34,6 +48,11 @@ class Observe(smach.State):
         return 'examine_puzzle'
 
 class ExaminePuzzle(smach.State):
+    """
+        The ExaminePuzzle state decodes the camera image into a string
+        and refines the possible patterns the human is constructing.
+        It will provide the next block to handover to the human
+    """
     def __init__(self):
         smach.State.__init__(self,
                              outcomes=['give_next_block'],
@@ -42,31 +61,35 @@ class ExaminePuzzle(smach.State):
 
     def execute(self, userdata):
         rospy.loginfo('Executing Examine Puzzle State')
-        global possiblePatterns
+        global POSSIBLE_PATTERNS
         global NUMERRGUESS
         # TODO: rosservice call that reports block sequence into a string and
-        # report into currentPattern
-        currentPattern = 'rr'   # replace with a rosservice that determines what blocks are shown
+        # report into current_pattern
+        current_pattern = 'rr'   # use rosservice that determines what blocks are shown
         if not userdata.is_pattern_known:
-            possiblePatterns = comparePattern(currentPattern, possiblePatterns)
-            numSolns = len(possiblePatterns)
-            if numSolns == 1:
+            POSSIBLE_PATTERNS = compare_pattern(current_pattern, POSSIBLE_PATTERNS)
+            num_solns = len(POSSIBLE_PATTERNS)
+            if num_solns == 1:
                 rospy.loginfo('Pattern Discovered!')
                 userdata.is_pattern_known = True
-                newPiece = nextBlock(possiblePatterns, currentPattern) # Write the next likely block
+                new_piece = next_block(RAND, POSSIBLE_PATTERNS, current_pattern) # next likely block
             else:
-                rospy.loginfo('Pattern still unknown. ' + str(numSolns) + ' possibilities')
+                rospy.loginfo('Pattern still unknown. ' + str(num_solns) + ' possibilities')
                 NUMERRGUESS = NUMERRGUESS + 1
-                newPiece = nextBlock(possiblePatterns, currentPattern, NUMERRGUESS)
+                new_piece = next_block(RAND, POSSIBLE_PATTERNS, current_pattern, NUMERRGUESS)
         else:
-            newPiece = nextBlock(possiblePatterns, currentPattern) # Write the next likely block
+            new_piece = next_block(RAND, POSSIBLE_PATTERNS, current_pattern) # next likely block
             rospy.loginfo('Pattern is known!')
-        userdata.next_block = newPiece
-        rospy.loginfo('Giving Block ' + newPiece)
+        userdata.next_block = new_piece
+        rospy.loginfo('Giving Block ' + new_piece)
         return 'give_next_block'
 
 
 class GiveBlock(smach.State):
+    """
+        The GiveBlock state provides the needed block (determined by the
+        ExaminePuzzle state) to the shared human-robot shared workspace
+    """
     # TODO: this state involves placing a block in the handover zone, the robot,
     # this may turn into a service state type or an action state type. Talk w/
     # Christina
@@ -89,30 +112,40 @@ class GiveBlock(smach.State):
         return 'observe'
 
 def is_block_placed_cb(data):
+    """
+        Function:    is_block_placed_cb
+        Input:       block placed? (boolean)
+        Output:      none
+    """
     rospy.loginfo('block has been placed!')
-    sm.userdata.sm_is_block_placed = data.data
+    SM.userdata.sm_is_block_placed = data.data
 
 def main():
+    """
+        Initializes and runs the state machine for the SIA-5.
+        State machine is viewable with
+        rosrun smach_viewer smach_viewer.py
+    """
     # Set up ROS functionality
     rospy.init_node('sia5_fsm')
     # ROS publisher and subscribers
     rospy.Subscriber('is_block_placed', Bool, is_block_placed_cb)
 
     # State Machine Setup
-    global sm
-    sm = smach.StateMachine(outcomes=['Selma'])
-    rospy.loginfo('SM defined')
+    global SM
+    SM = smach.StateMachine(outcomes=['Selma'])
+    rospy.loginfo('sm defined')
 
     # Initialize state machine variables
-    sm.userdata.sm_is_block_placed = False
-    sm.userdata.sm_is_pattern_known = False
-    sm.userdata.sm_next_block = ''
+    SM.userdata.sm_is_block_placed = False
+    SM.userdata.sm_is_pattern_known = False
+    SM.userdata.sm_next_block = ''
 
     # Pattern Globals
-    global possiblePatterns
-    possiblePatterns = createPatterns()
+    global POSSIBLE_PATTERNS
+    POSSIBLE_PATTERNS = create_patterns()
 
-    with sm:
+    with SM:
         # Add states to container
         smach.StateMachine.add('OBSERVE', Observe(),
                                transitions={'examine_puzzle':'EXAMINEPUZZLE'},
@@ -128,10 +161,10 @@ def main():
                                           'next_block':'sm_next_block',
                                           'is_block_placed_in':'sm_is_block_placed'})
 
-    sis = smach_ros.IntrospectionServer('sia5_fsm', sm, '/SM_ROOT')
+    sis = smach_ros.IntrospectionServer('sia5_fsm', SM, '/sm_ROOT')
     sis.start()
 
-    sm.execute()
+    SM.execute()
     rospy.spin()
     sis.stop()
 

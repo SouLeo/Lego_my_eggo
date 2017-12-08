@@ -41,7 +41,7 @@ Lorem Ipsum nonsense
 ## Run
 1. To run just the FSM
     ```
-    roslaunch Lego_my_eggo FSM.launch
+    roslaunch sia5_hri_fsm FSM.launch
     ```
     *Currently you need to publish to is_block_placed topic in order for it to
     change states

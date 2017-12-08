@@ -15,7 +15,8 @@ import rospy
 import smach
 import smach_ros
 from Puzzle import create_patterns, compare_pattern, next_block
-from std_msgs.msg import Bool, Int32
+from Block import get_pose
+from std_msgs.msg import Bool
 
 SM = None
 TIMEOUT_SECS = 30
@@ -107,7 +108,10 @@ class GiveBlock(smach.State):
         else:
             # Place block
             # TODO: rosservice call to place a the next block in the drop off zone
-            print 'lol'
+            block_pose = get_pose(userdata.next_block)
+            rospy.loginfo('Pose is ' + str(block_pose.pose.position.x) + ', '
+                          + str(block_pose.pose.position.y))
+
         # TODO: Visually check for updated puzzle
         return 'observe'
 
@@ -133,7 +137,7 @@ def main():
 
     # State Machine Setup
     global SM
-    SM = smach.StateMachine(outcomes=['Selma'])
+    SM = smach.StateMachine(outcomes=[''])
     rospy.loginfo('sm defined')
 
     # Initialize state machine variables

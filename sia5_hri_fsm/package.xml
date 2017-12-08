@@ -48,6 +48,11 @@
   <run_depend>smach</run_depend>
   <run_depend>smach_ros</run_depend>
   <run_depend>std_msgs</run_depend>
+  <build_depend>message_generation</build_depend>
+  <run_depend>message_generation</run_depend>
+  <run_depend>message_runtime</run_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <run_depend>geometry_msgs</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

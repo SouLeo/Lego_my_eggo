@@ -1,6 +1,6 @@
-#include "sia5_hri_fsm/move_down.h"
 #include <ros/ros.h>
 #include <iostream>
+#include "sia5_hri_fsm/move_down.h"
 
 int main(int argc, char **argv)
 {

@@ -11,6 +11,8 @@
 #include "linux/input.h"
 #include <sys/stat.h>
 #include <std_msgs/Float32.h>
+#include <ros/ros.h>
+#include <iostream>
 
 class MoveDown
 {

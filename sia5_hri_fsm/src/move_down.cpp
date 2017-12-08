@@ -33,7 +33,8 @@ bool MoveDown::initialize()
      n.getParam("/config_data/ft_frame", ftFrame) &&
      n.getParam("/config_data/control_frame", controlFrame) &&
      n.getParam("/config_data/vel_topic", velTopic) &&
-     n.getParam("/config_data/ft_address", ftAddress))
+     n.getParam("/config_data/ft_address", ftAddress) &&
+     n.getParam("/config_data/bowl_pos", bowlPos))
   {
     // Initialize contact_control
     cc.setFTAddress(ftAddress);
@@ -58,21 +59,34 @@ bool MoveDown::initialize()
 void MoveDown::run()
 {
   // Tell FT driver to start getting data
-  
+  activateGripper();
   // Set moves to half speed 
   mi->setVelocityScaling(0.3);
-  
-
-  // moveToPose(x,
-  //            y,
-  //            z+0.1,
-  //            M_PI,
-  //            0,
-  //            M_PI);
+  gi->setSpeed(0);
+  gi->setForce(40);
+  gi->setMode(RSGripperInterface::MODE_PINCH);
+  openGripper();
+  double x = 0.2;
+  double y = 0.2;
+  double z = 0.2;
+  moveToPose(x,
+             y,
+             z+0.1,
+             0,
+             0,
+             0);
   ros::Duration(0.3).sleep();
 
-  
+  moveToPose(x,
+           y,
+           z,
+           0,
+           0,
+           0);
+  closeGripper();
 
+  if(!moveWithInput(bowlPos, "bowl", false))
+    return;
 
   ros::Duration(0.3).sleep();
   

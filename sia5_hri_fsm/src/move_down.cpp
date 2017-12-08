@@ -90,7 +90,9 @@ void MoveDown::run()
 
   ros::Duration(0.3).sleep();
   
-  // Bias the netft sensor
+  openGripper();
+
+  bool handover_bool = true;
   
 
   

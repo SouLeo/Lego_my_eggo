@@ -27,7 +27,6 @@ Lorem Ipsum nonsense
     cd ~/Lego_my_eggo
     catkin build
     ```
-    *It's all python right now, so if it doesn't compile, email me...
 
 4. Adjust your bashrc
     ```

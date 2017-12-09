@@ -24,11 +24,6 @@ from std_msgs.msg import Bool
 import sia5_hri_fsm.srv
 
 SM = None
-TIMEOUT_SECS = 30
-RAND = True
-NUMERRGUESS = 0
-POSSIBLE_PATTERNS = []
-STARTER_PATTERNS = ''
 
 class Observe(smach.State):
     """
@@ -41,10 +36,11 @@ class Observe(smach.State):
                              outcomes=['examine_puzzle'],
                              input_keys=['is_block_placed_in'],
                              output_keys=[''])
+        self.timeout_secs = 30
 
     def execute(self, userdata):
         rospy.loginfo('Executing Observation State')
-        timeout = rospy.Time.now() + rospy.Duration(TIMEOUT_SECS)
+        timeout = rospy.Time.now() + rospy.Duration(self.timeout_secs)
         while not userdata.is_block_placed_in and rospy.Time.now() <= timeout:
             pass
         if not userdata.is_block_placed_in:
@@ -64,27 +60,30 @@ class ExaminePuzzle(smach.State):
                              outcomes=['give_next_block'],
                              input_keys=['is_blocked_placed_out', 'is_pattern_known'],
                              output_keys=['next_block'])
+        self.rand = True
+        self.numerrguess = 0
+        self.possible_patterns = []
+        self.possible_patterns = create_patterns()
 
     def execute(self, userdata):
         rospy.loginfo('Executing Examine Puzzle State')
-        global POSSIBLE_PATTERNS
-        global NUMERRGUESS
         # TODO: rosservice call that reports block sequence into a string and
         # report into current_pattern
         current_pattern = 'rr'   # use rosservice that determines what blocks are shown
         if not userdata.is_pattern_known:
-            POSSIBLE_PATTERNS = compare_pattern(current_pattern, POSSIBLE_PATTERNS)
-            num_solns = len(POSSIBLE_PATTERNS)
+            self.possible_patterns = compare_pattern(current_pattern, self.possible_patterns)
+            num_solns = len(self.possible_patterns)
             if num_solns == 1:
                 rospy.loginfo('Pattern Discovered!')
                 userdata.is_pattern_known = True
-                new_piece = next_block(RAND, POSSIBLE_PATTERNS, current_pattern) # next likely block
+                new_piece = next_block(self.rand, self.possible_patterns, current_pattern)
             else:
                 rospy.loginfo('Pattern still unknown. ' + str(num_solns) + ' possibilities')
-                NUMERRGUESS = NUMERRGUESS + 1
-                new_piece = next_block(RAND, POSSIBLE_PATTERNS, current_pattern, NUMERRGUESS)
+                self.numerrguess = self.numerrguess + 1
+                new_piece = next_block(self.rand, self.possible_patterns,
+                                       current_pattern, self.numerrguess)
         else:
-            new_piece = next_block(RAND, POSSIBLE_PATTERNS, current_pattern) # next likely block
+            new_piece = next_block(self.rand, self.possible_patterns, current_pattern)
             rospy.loginfo('Pattern is known!')
         userdata.next_block = new_piece
         rospy.loginfo('Giving Block ' + new_piece)
@@ -101,14 +100,15 @@ class GiveBlock(smach.State):
                              outcomes=['observe', 'trigger_handover'],
                              input_keys=['next_block'],
                              output_keys=['is_block_placed_in'])
+        self.starter_patterns = ''
+        self.starter_patterns = create_starter_patterns()
 
     def execute(self, userdata):
         rospy.loginfo('Executing Give Block State')
-        global STARTER_PATTERNS
-        handover_block = is_piece_available(userdata.next_block, STARTER_PATTERNS)
+        handover_block = is_piece_available(userdata.next_block, self.starter_patterns)
         if handover_block:
             rospy.loginfo('No action taken')
-            STARTER_PATTERNS = STARTER_PATTERNS.replace(userdata.next_block, '')
+            self.starter_patterns = self.starter_patterns.replace(userdata.next_block, '')
             # TODO: rosservice: visually check for updated puzzle
             # change the return statement from observe to the service state
             # which will check if puzzle updated
@@ -149,13 +149,6 @@ def main():
     SM.userdata.sm_is_block_placed = False
     SM.userdata.sm_is_pattern_known = False
     SM.userdata.sm_next_block = ''
-
-    # Pattern Globals
-    global POSSIBLE_PATTERNS
-    POSSIBLE_PATTERNS = create_patterns()
-
-    global STARTER_PATTERNS
-    STARTER_PATTERNS = create_starter_patterns()
 
     with SM:
         # Add states to container

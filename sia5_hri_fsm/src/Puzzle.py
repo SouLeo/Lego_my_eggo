@@ -98,10 +98,10 @@ def is_piece_available(color, starter_pieces):
     """
     if color in starter_pieces:
         rospy.loginfo('User has needed piece: ' + color)
-        return False
+        return True
     else:
         rospy.loginfo('Robot will handover piece: ' + color)
-        return True
+        return False
 
 #def main():
 #    possible_patterns = []

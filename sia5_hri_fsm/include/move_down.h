@@ -39,7 +39,7 @@ private:
   void openGripper();
   void closeGripper(bool slow = false);
   void moveToPose(float x, float y, float z,
-    float xr, float yr, float zr);
+  float xr, float yr, float zr);
   // ROS publisher
   ros::Publisher gripperPub;
 };

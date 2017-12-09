@@ -89,7 +89,6 @@ class ExaminePuzzle(smach.State):
         rospy.loginfo('Giving Block ' + new_piece)
         return 'give_next_block'
 
-
 class GiveBlock(smach.State):
     """
         The GiveBlock state provides the needed block (determined by the

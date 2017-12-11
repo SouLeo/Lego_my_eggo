@@ -3,10 +3,10 @@ move_group:
   trajectory_execution: {allowed_execution_duration_scaling: 1.5, execution_velocity_scaling: 1.0}
 config_data:
   move_group: "sia5_ft"
-  fixed_frame: "base_link"
-  vel_frame: "base_link"
+  fixed_frame: "world"
+  vel_frame: "world"
   ft_frame: "ft_sensor"
-  control_frame: "base_link"
+  control_frame: "world"
   vel_topic: "/jogging_vector_world"
   ft_address: "192.168.1.84"
   init_pos: [1.57079632679, 0.3, 0.0, -0.9, 0.0, 0.6, 0.0]

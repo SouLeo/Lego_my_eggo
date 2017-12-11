@@ -72,24 +72,34 @@ void MoveDown::run()
   double x = 0.4;
   double y = 0.35;
   double z = 0.22;
-  double xx = 0.0;
-  double yy = 1.5708;
+  double ww = 0.0;
+  double xx = 0.964;
+  double yy = -0.267;
   double zz = 0.0;
 
-  moveToPose(x,
-             y,
-             z,
-             xx,
-             yy,
-             zz);
-  ros::Duration(0.3).sleep();
+  // moveToPose(x,
+  //            y,
+  //            z,
+  //            xx,
+  //            yy,
+  //            zz);
+  // ros::Duration(0.3).sleep();
+
+  geometry_msgs::Pose ref = createPose(x, y, z,
+    ww, xx, yy, zz);
+
+  geometry_msgs::PoseStamped posey_pose;
+
+  posey_pose.pose = ref;
+
+  mi->moveArm(posey_pose, 1.0, false);
 
   // moveToPose(x,
   //          y,
-  //          z,
-  //          0,
-  //          0,
-  //          0);
+  //          z-0.1,
+  //          xx,
+  //          yy,
+  //          zz);
   closeGripper();
 
   if(!moveWithInput(bowlPos, "bowl", false))

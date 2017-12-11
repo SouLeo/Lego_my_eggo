@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <iostream>
-#include "sia5_hri_fsm/move_down.h"
+#include "move_down.h"
 
 int main(int argc, char **argv)
 {
@@ -12,7 +12,7 @@ int main(int argc, char **argv)
   ros::AsyncSpinner spinner(3);
   spinner.start();
   {
-    ros::ServiceServer service = n.advertiseService("handover", handover);
+    // ros::ServiceServer service = n.advertiseService("handover", MoveDown::handover);
     MoveDown moveTest(n);
     moveTest.moveDown();
   }

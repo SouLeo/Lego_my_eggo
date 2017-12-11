@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>sia5_hri_fsm</name>
   <version>0.0.0</version>
   <description>The sia5_hri_fsm package</description>
@@ -40,19 +40,20 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>rospy</build_depend>
-  <build_depend>smach</build_depend>
-  <build_depend>smach_ros</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <run_depend>rospy</run_depend>
-  <run_depend>smach</run_depend>
-  <run_depend>smach_ros</run_depend>
-  <run_depend>std_msgs</run_depend>
-  <build_depend>message_generation</build_depend>
-  <run_depend>message_generation</run_depend>
-  <run_depend>message_runtime</run_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <run_depend>geometry_msgs</run_depend>
+  <depend>rospy</depend>
+  <depend>smach</depend>
+  <depend>smach_ros</depend>
+  <depend>std_msgs</depend>
+  <depend>message_generation</depend>
+  <depend>message_runtime</depend>
+  <depend>geometry_msgs</depend>
+  <depend>roscpp</depend>
+  <depend>eigen_conversions</depend>
+  <depend>tf</depend>
+  <depend>contact_control</depend>
+  <depend>collision_interface</depend>
+  <depend>grasp_interface</depend>
+
 
 
   <!-- The export tag contains other, unspecified, tags -->

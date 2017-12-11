@@ -4,17 +4,24 @@ project(sia5_hri_fsm)
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
+set( CMAKE_CXX_FLAGS "-std=c++11" )
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   rospy
-  roscpp
   smach
   smach_ros
   std_msgs
-  geometry_msgs
+  roscpp
   message_generation
+  geometry_msgs
+  contact_control
+  collision_interface
+  grasp_interface
+  eigen_conversions
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -60,6 +67,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate services in the 'srv' folder
  add_service_files(
    FILES
+#   Service1.srv
+#   Service2.srv
    Handover.srv
  )
 
@@ -74,8 +83,8 @@ find_package(catkin REQUIRED COMPONENTS
  generate_messages(
    DEPENDENCIES
    std_msgs
-   sia5_hri_fsm
    geometry_msgs
+   sia5_hri_fsm
  )
 
 ################################################
@@ -110,7 +119,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES sia5_hri_fsm
-#  CATKIN_DEPENDS rospy smach smach_ros std_msgs message_runtime
+#  CATKIN_DEPENDS rospy smach smach_ros std_msgs geometry_msgs message_generation contact_control collision_interface
 #  DEPENDS system_lib
 )
 
@@ -121,9 +130,11 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
 )
+include_directories(contact_control/include)
+include_directories(collision_interface/include)
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
@@ -139,6 +150,13 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/sia5_hri_fsm_node.cpp)
+
+add_executable(handover_node src/move_down_main.cpp src/move_down.cpp)
+target_link_libraries(handover_node ${catkin_LIBRARIES})
+
+add_executable(demo src/demo.cpp src/move_down.cpp)
+add_dependencies(demo ${${PROJECT_NAME}_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
+target_link_libraries(demo ${catkin_LIBRARIES} ${OpenCV_LIBS} ${catkin_LIBRARIES} )
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -175,7 +193,6 @@ include_directories(
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
-
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
 #   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}

@@ -13,6 +13,7 @@
 #include <std_msgs/Float32.h>
 #include <ros/ros.h>
 #include <iostream>
+//#include "sia5_hri_fsm/Handover.h"
 
 class MoveDown
 {
@@ -24,6 +25,9 @@ public:
   void run();
   void cleanup();
   void moveDown();
+
+//  bool handover(sia5_hri_fsm::Request  &req,
+//         sia5_hri_fsm::Response &res);
   
 private:
   // Node handle
@@ -35,8 +39,13 @@ private:
   CollisionInterface* oi;                           // Interface to add objects to planning scene
   RSGripperInterface* gi;                           // Gripper interface
   
+  std::vector<double> bowlPos;
+
   // Gripper functions
+  void activateGripper();
   void openGripper();
+  void flushInput();
+  bool moveWithInput(std::vector<double> joints, std::string name, bool pause = true);
   void closeGripper(bool slow = false);
   void moveToPose(float x, float y, float z,
   float xr, float yr, float zr);

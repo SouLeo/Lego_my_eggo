@@ -117,9 +117,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES sia5_hri_fsm
-#  CATKIN_DEPENDS rospy smach smach_ros std_msgs geometry_msgs message_generation contact_control collision_interface
+  CATKIN_DEPENDS rospy smach smach_ros std_msgs geometry_msgs message_generation contact_control collision_interface
 #  DEPENDS system_lib
 )
 

@@ -38,7 +38,7 @@ private:
   MoveInterface* mi;                                // Interface for Moveit moves
   CollisionInterface* oi;                           // Interface to add objects to planning scene
   RSGripperInterface* gi;                           // Gripper interface
-  
+  ros::Publisher markerPub;
   std::vector<double> bowlPos;
 
   // Gripper functions
@@ -49,7 +49,10 @@ private:
   void closeGripper(bool slow = false);
   void moveToPose(float x, float y, float z,
   float xr, float yr, float zr);
+  geometry_msgs::Pose createPose(double x, double y, double z,
+    double ww, double xx, double yy, double zz);
   // ROS publisher
   ros::Publisher gripperPub;
+  void showArrow(geometry_msgs::PoseStamped tempPose);
 };
 

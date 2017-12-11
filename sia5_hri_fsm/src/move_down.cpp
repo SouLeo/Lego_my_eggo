@@ -6,6 +6,7 @@ MoveDown::MoveDown(ros::NodeHandle nh) :
   n(nh),
   cc()
 {
+  markerPub = n.advertise<visualization_msgs::Marker>("/marker",1);
 }
 
 // bool MoveDown::handover(sia5_hri_fsm::MoveDown::Request  &req,
@@ -46,7 +47,7 @@ bool MoveDown::initialize()
     
     oi = new CollisionInterface(n);
     gi = new RSGripperInterface();
-    ros::Duration(1.0).sleep();
+    ros::Duration(3.0).sleep();
     return true;
   }
   else
@@ -68,23 +69,27 @@ void MoveDown::run()
   activateGripper();
   gi->setMode(RSGripperInterface::MODE_PINCH);
   openGripper();
-  double x = 0.2;
-  double y = 0.2;
-  double z = 0.2;
-  moveToPose(x,
-             y,
-             z+0.1,
-             0,
-             0,
-             0);
-  ros::Duration(0.3).sleep();
+  double x = 0.4;
+  double y = 0.35;
+  double z = 0.22;
+  double xx = 0.0;
+  double yy = 1.5708;
+  double zz = 0.0;
 
   moveToPose(x,
-           y,
-           z,
-           0,
-           0,
-           0);
+             y,
+             z,
+             xx,
+             yy,
+             zz);
+  ros::Duration(0.3).sleep();
+
+  // moveToPose(x,
+  //          y,
+  //          z,
+  //          0,
+  //          0,
+  //          0);
   closeGripper();
 
   if(!moveWithInput(bowlPos, "bowl", false))
@@ -124,6 +129,8 @@ void MoveDown::moveToPose(float x, float y, float z,
   tf::Quaternion orientation;
   orientation.setEuler(yr, xr, zr);
   tf::quaternionTFToMsg(orientation,tempPose.pose.orientation);
+
+  showArrow(tempPose);
 
   mi->moveArm(tempPose, 1.0, false);
   if(mi->waitForStatus() == MoveInterface::STATUS_ERROR)
@@ -205,4 +212,36 @@ void MoveDown::flushInput()
   char ch;
   while ( std::cin.get ( ch ) && ch != '\n' )
     ;
+}
+
+geometry_msgs::Pose MoveDown::createPose(double x, double y, double z,
+    double ww, double xx, double yy, double zz)
+{
+  geometry_msgs::Pose ret;
+  ret.position.x = x;
+  ret.position.y = y;
+  ret.position.z = z;
+  ret.orientation.w = ww;
+  ret.orientation.x = xx;
+  ret.orientation.y = yy;
+  ret.orientation.z = zz;
+  return ret;
+}
+
+void MoveDown::showArrow(geometry_msgs::PoseStamped tempPose) {
+  visualization_msgs::Marker pointer;
+  pointer.pose = tempPose.pose;
+  tempPose.header.stamp = ros::Time::now();
+  pointer.scale.x=0.05;
+  pointer.scale.y=0.01;
+  pointer.scale.z=0.01;
+  pointer.color.a=1.0;
+  pointer.color.r=1.0;
+  pointer.color.g=1.0;
+  pointer.color.b=1.0;
+  pointer.header.frame_id = std::string(tempPose.header.frame_id);
+  pointer.type=visualization_msgs::Marker::ARROW;
+  markerPub.publish(pointer);
+
+  // publishPoseAsTransform(tempPose, "grasp_pose");
 }

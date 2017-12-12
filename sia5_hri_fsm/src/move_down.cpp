@@ -9,14 +9,12 @@ MoveDown::MoveDown(ros::NodeHandle nh) :
   markerPub = n.advertise<visualization_msgs::Marker>("/marker",1);
 }
 
-// bool MoveDown::handover(sia5_hri_fsm::MoveDown::Request  &req,
-//          sia5_hri_fsm::MoveDown::Response &res)
-// {
-//   moveDown();
-//   ROS_INFO("request: ", (geometry_messages::PoseStamped)tempPose);
-//   ROS_INFO("sending back response: ", (bool)handover_bool);
-//   return true;
-// }
+bool MoveDown::handover(sia5_hri_fsm::Handover::Request&  req,
+         sia5_hri_fsm::Handover::Response& res)
+{
+  moveDown();
+  return true;
+}
 
 MoveDown::~MoveDown()
 {
@@ -69,6 +67,8 @@ void MoveDown::run()
   activateGripper();
   gi->setMode(RSGripperInterface::MODE_PINCH);
   openGripper();
+
+
   double x = 0.4;
   double y = 0.35;
   double z = 0.22;
@@ -92,7 +92,7 @@ void MoveDown::run()
 
   posey_pose.pose = ref;
 
-  mi->moveArm(posey_pose, 1.0, false);
+  mi->moveCart(posey_pose, 1.0, false);
 
   // moveToPose(x,
   //          y,

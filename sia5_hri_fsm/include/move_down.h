@@ -13,7 +13,7 @@
 #include <std_msgs/Float32.h>
 #include <ros/ros.h>
 #include <iostream>
-//#include "sia5_hri_fsm/Handover.h"
+#include "sia5_hri_fsm/Handover.h"
 
 class MoveDown
 {
@@ -26,8 +26,8 @@ public:
   void cleanup();
   void moveDown();
 
-//  bool handover(sia5_hri_fsm::Request  &req,
-//         sia5_hri_fsm::Response &res);
+  bool handover(sia5_hri_fsm::Handover::Request&  req,
+         sia5_hri_fsm::Handover::Response& res);
   
 private:
   // Node handle

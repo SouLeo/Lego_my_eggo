@@ -15,7 +15,9 @@ int main(int argc, char **argv)
 
 
   MoveDown moveDownTest(node_);
+  moveDownTest.initialize();
   ros::ServiceServer ss = node_.advertiseService("handover", &MoveDown::handover, &moveDownTest);
+  moveDownTest.run();
 
 
   // ros::spin();

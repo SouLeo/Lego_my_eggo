@@ -1,0 +1,22 @@
+<launch>
+    <node
+        name    = "FSM"
+        pkg     = "sia5_hri_fsm"
+        type    = "FSM.py"
+        args    = ""
+
+        respawn = "false"
+        output  = "screen"
+    />
+
+    <node
+	name	= "block_ready"
+	pkg	= "sia5_hri_fsm"
+	type	= "Wait_for_button.py"
+	args	= ""
+
+	respawn	= "false"
+	output	= "screen"
+    />
+
+</launch>

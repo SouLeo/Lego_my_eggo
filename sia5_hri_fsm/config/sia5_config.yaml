@@ -2,11 +2,11 @@ move_group:
   ompl: {maximum_waypoint_distance: 0.05}
   trajectory_execution: {allowed_execution_duration_scaling: 1.5, execution_velocity_scaling: 1.0}
 config_data:
-  move_group: "sia5_ft"
-  fixed_frame: "world"
-  vel_frame: "world"
+  move_group: "sia5"
+  fixed_frame: "base_link"
+  vel_frame: "base_link"
   ft_frame: "ft_sensor"
-  control_frame: "world"
+  control_frame: "base_link"
   vel_topic: "/jogging_vector_world"
   ft_address: "192.168.1.84"
   init_pos: [1.57079632679, 0.3, 0.0, -0.9, 0.0, 0.6, 0.0]
@@ -16,6 +16,7 @@ config_data:
   peg_pos: [3.03772, -0.068844, -0.499915, -0.187423, -3.01439, 1.32481, 2.36646]
   pole_pos: [1.37121, -0.455921, 0.421021, 0.31364, 2.93868, 1.43329, 2.86402]
   chuck_pos: [0.761442, -0.784812, 1.35899, 0.122775, 2.37895, 1.51065, 0.525251]
-  bowl_pos: [0.761442, -0.784812, 1.35899, 0.122775, 2.37895, 1.51065, 0.525251]
+  bowl_pos: [1.54087, -1.1486, 1.19562, 1.1206, 2.209, 1.3941, 0.523499]
+
   ft_type: "ip"
   ft_info: "192.168.1.84"

@@ -22,7 +22,7 @@ MoveDown::~MoveDown()
     delete gi;
 }
 
-bool MoveDown::initialize()
+bool MoveDown::initialize() // initialize everything
 {
   // Get config data
   bowlPos.resize(7);
@@ -56,9 +56,9 @@ bool MoveDown::initialize()
   
 }
 
-void MoveDown::run()
+void MoveDown::run() // where the code actually runs
 {
-  // Tell FT driver to start getting data
+
   bool handover_bool = false;
   // Set moves to half speed 
   mi->setVelocityScaling(0.3);
@@ -69,13 +69,45 @@ void MoveDown::run()
   openGripper();
 
 
-  double x = 0.4;
-  double y = 0.35;
-  double z = 0.22;
+
+
+
+// // yellow block
+//   double x = 0.339;
+//   double y = 0.295;
+//   double z = 0.17;
+//   double ww = 0.0;
+//   double xx = 0.964;
+//   double yy = -0.267;
+//   double zz = 0.0;
+
+// // blue block
+//   double x = 0.489;
+//   double y = 0.295;
+//   double z = 0.17;
+//   double ww = 0.0;
+//   double xx = 0.964;
+//   double yy = -0.267;
+//   double zz = 0.0;
+
+// // red block
+//   double x = 0.489;
+//   double y = 0.460;
+//   double z = 0.17;
+//   double ww = 0.0;
+//   double xx = 0.964;
+//   double yy = -0.267;
+//   double zz = 0.0;
+
+// green block
+  double x = 0.339;
+  double y = 0.460;
+  double z = 0.17;
   double ww = 0.0;
   double xx = 0.964;
   double yy = -0.267;
   double zz = 0.0;
+
 
   // moveToPose(x,
   //            y,
@@ -88,9 +120,19 @@ void MoveDown::run()
   geometry_msgs::Pose ref = createPose(x, y, z,
     ww, xx, yy, zz);
 
+
   geometry_msgs::PoseStamped posey_pose;
 
   posey_pose.pose = ref;
+  posey_pose.header.frame_id = "world";
+
+  // publishPoseAsTransform(posey_pose,"target pose");
+  
+  // showArrow(posey_pose);
+
+  mi->moveArm(posey_pose, 1.0, false);
+
+  posey_pose.pose.position.z = 0.11;
 
   mi->moveCart(posey_pose, 1.0, false);
 
@@ -101,6 +143,10 @@ void MoveDown::run()
   //          yy,
   //          zz);
   closeGripper();
+
+  posey_pose.pose.position.z = 0.20;
+
+  mi->moveCart(posey_pose, 1.0, false);
 
   if(!moveWithInput(bowlPos, "bowl", false))
     return;
@@ -149,7 +195,7 @@ void MoveDown::moveToPose(float x, float y, float z,
 
 void MoveDown::openGripper()
 {
-  gi->setPosition(80); //107 is fully closed for pinch mode
+  gi->setPosition(70); //107 is fully closed for pinch mode
 }
 
 void MoveDown::activateGripper()
@@ -254,4 +300,21 @@ void MoveDown::showArrow(geometry_msgs::PoseStamped tempPose) {
   markerPub.publish(pointer);
 
   // publishPoseAsTransform(tempPose, "grasp_pose");
+}
+
+void MoveDown::publishPoseAsTransform(geometry_msgs::PoseStamped tempPose,
+    std::string frame_name) {
+
+  geometry_msgs::TransformStamped transform;
+  transform.transform.rotation = tempPose.pose.orientation;
+  geometry_msgs::Vector3 translation;
+  translation.x = tempPose.pose.position.x;
+  translation.y = tempPose.pose.position.y;
+  translation.z = tempPose.pose.position.z;
+  transform.transform.translation = translation;
+  transform.header = tempPose.header;
+  transform.header.stamp = ros::Time::now();
+  transform.child_frame_id = frame_name;
+
+  broadcaster.sendTransform(transform);
 }

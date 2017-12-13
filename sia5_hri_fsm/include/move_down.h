@@ -40,6 +40,7 @@ private:
   RSGripperInterface* gi;                           // Gripper interface
   ros::Publisher markerPub;
   std::vector<double> bowlPos;
+  tf::TransformBroadcaster broadcaster;
 
   // Gripper functions
   void activateGripper();
@@ -54,5 +55,7 @@ private:
   // ROS publisher
   ros::Publisher gripperPub;
   void showArrow(geometry_msgs::PoseStamped tempPose);
+  void publishPoseAsTransform(geometry_msgs::PoseStamped tempPose,
+    std::string frame_name);
 };
 

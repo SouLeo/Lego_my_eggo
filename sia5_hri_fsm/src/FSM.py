@@ -58,22 +58,23 @@ class ExaminePuzzle(smach.State):
     def __init__(self):
         smach.State.__init__(self,
                              outcomes=['give_next_block'],
-                             input_keys=['pattern', 'is_pattern_known'],
+                             input_keys=['pattern'],
                              output_keys=['next_block'])
         self.rand = True
         self.numerrguess = 0
         self.possible_patterns = []
         self.possible_patterns = create_patterns()
+        self.is_pattern_known = False
 
     def execute(self, userdata):
         rospy.loginfo('Executing Examine Puzzle State')
         current_pattern = userdata.pattern   # TODO: use rosservice that determines what blocks are shown
-        if not userdata.is_pattern_known:
+        if not self.is_pattern_known:
             self.possible_patterns = compare_pattern(current_pattern, self.possible_patterns)
             num_solns = len(self.possible_patterns)
             if num_solns == 1:
                 rospy.loginfo('Pattern Discovered!')
-                userdata.is_pattern_known = True
+                self.is_pattern_known = True
                 new_piece = next_block(self.rand, self.possible_patterns, current_pattern)
             else:
                 rospy.loginfo('Pattern still unknown. ' + str(num_solns) + ' possibilities')
@@ -143,7 +144,6 @@ def main():
 
     # Initialize state machine variables
     SM.userdata.sm_is_block_placed = False
-    SM.userdata.sm_is_pattern_known = False
     SM.userdata.sm_next_block = ''
 
     with SM:
@@ -154,13 +154,11 @@ def main():
         smach.StateMachine.add('EXAMINEPUZZLE', ExaminePuzzle(),
                                transitions={'give_next_block':'GIVEBLOCK'},
                                remapping={'is_block_placed_out':'sm_is_block_placed',
-                                          'is_pattern_known':'sm_is_pattern_known',
                                           'next_block':'sm_next_block'})
         smach.StateMachine.add('GIVEBLOCK', GiveBlock(),
                                transitions={'observe':'OBSERVE',
                                             'trigger_handover':'TRIGGERHANDOVER'},
-                               remapping={'is_pattern_known':'sm_is_pattern_known',
-                                          'next_block':'sm_next_block',
+                               remapping={'next_block':'sm_next_block',
                                           'is_block_placed_in':'sm_is_block_placed'})
         smach.StateMachine.add('TRIGGERHANDOVER', ServiceState('handover',
                                                                sia5_hri_fsm.srv.Handover,
@@ -171,7 +169,7 @@ def main():
         smach.StateMachine.add('TRIGGERPATTERNSTATUS', ServiceState('pattern',
                                                                sia5_hri_fsm.srv.Pattern,
                                                                request_slots=[''],
-                                                               response_slots=['pattern', 'is_pattern_known'],
+                                                               response_slots=['pattern'],
                                                                outcomes=['examine_puzzle']),
                                transitions={'examine_puzzle':'EXAMINEPUZZLE'})
     sis = smach_ros.IntrospectionServer('sia5_fsm', SM, '/SM_ROOT')

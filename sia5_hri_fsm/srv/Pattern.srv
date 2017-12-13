@@ -2,4 +2,3 @@
 ---
 #response
 string    pattern
-bool      is_pattern_known

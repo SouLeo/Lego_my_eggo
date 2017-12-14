@@ -26,8 +26,8 @@ public:
   void cleanup();
   void moveDown();
 
-  bool handover(sia5_hri_fsm::Handover::Request&  req,
-         sia5_hri_fsm::Handover::Response& res);
+  bool handover(sia5_hri_fsm::Handover::Request &req,
+         sia5_hri_fsm::Handover::Response &res);
   
 private:
   // Node handle
@@ -57,5 +57,6 @@ private:
   void showArrow(geometry_msgs::PoseStamped tempPose);
   void publishPoseAsTransform(geometry_msgs::PoseStamped tempPose,
     std::string frame_name);
+  geometry_msgs::PoseStamped lego_pose_;
 };
 

@@ -160,13 +160,13 @@ def main():
                                             'trigger_handover':'TRIGGERHANDOVER'},
                                remapping={'next_block':'sm_next_block',
                                           'is_block_placed_in':'sm_is_block_placed'})
-        smach.StateMachine.add('TRIGGERHANDOVER', ServiceState('handover',
+        smach.StateMachine.add('TRIGGERHANDOVER', ServiceState('sia5_hri_fsm/Handover',
                                                                sia5_hri_fsm.srv.Handover,
                                                                request_slots=['block_pose'],
                                                                response_slots=['handover_bool'],
                                                                outcomes=['observe']),
                                transitions={'observe':'OBSERVE'})
-        smach.StateMachine.add('TRIGGERPATTERNSTATUS', ServiceState('pattern',
+        smach.StateMachine.add('TRIGGERPATTERNSTATUS', ServiceState('sia5_hri_fsm/Pattern',
                                                                sia5_hri_fsm.srv.Pattern,
                                                                request_slots=[''],
                                                                response_slots=['pattern'],

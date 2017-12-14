@@ -9,9 +9,11 @@ MoveDown::MoveDown(ros::NodeHandle nh) :
   markerPub = n.advertise<visualization_msgs::Marker>("/marker",1);
 }
 
-bool MoveDown::handover(sia5_hri_fsm::Handover::Request&  req,
-         sia5_hri_fsm::Handover::Response& res)
+bool MoveDown::handover(sia5_hri_fsm::Handover::Request &req,
+         sia5_hri_fsm::Handover::Response &res)
 {
+  lego_pose_ = req.tempPose;
+  ROS_INFO_STREAM(lego_pose_);
   moveDown();
   return true;
 }
@@ -130,11 +132,11 @@ void MoveDown::run() // where the code actually runs
   
   // showArrow(posey_pose);
 
-  mi->moveArm(posey_pose, 1.0, false);
+  mi->moveArm(lego_pose_, 1.0, false);
 
-  posey_pose.pose.position.z = 0.11;
+  lego_pose_.pose.position.z = 0.11;
 
-  mi->moveCart(posey_pose, 1.0, false);
+  mi->moveCart(lego_pose_, 1.0, false);
 
   // moveToPose(x,
   //          y,
@@ -144,9 +146,9 @@ void MoveDown::run() // where the code actually runs
   //          zz);
   closeGripper();
 
-  posey_pose.pose.position.z = 0.20;
+  lego_pose_.pose.position.z = 0.20;
 
-  mi->moveCart(posey_pose, 1.0, false);
+  mi->moveCart(lego_pose_, 1.0, false);
 
   if(!moveWithInput(bowlPos, "bowl", false))
     return;

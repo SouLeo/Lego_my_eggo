@@ -37,20 +37,20 @@ def get_pose(color):
         Output: pose (ROS PoseStamped)
     """
     block_pose = PoseStamped()
-    block_pose.header.frame_id = "/block_pose"
+    block_pose.header.frame_id = "/world"
     block_pose.header.stamp = rospy.Time.now()
     if color == 'r':
-        block_pose.pose.position.x = 0
-        block_pose.pose.position.y = 0
+        block_pose.pose.position.x = 0.489
+        block_pose.pose.position.y = 0.460
     elif color == 'y':
-        block_pose.pose.position.x = 1
-        block_pose.pose.position.y = 1
+        block_pose.pose.position.x = 0.339
+        block_pose.pose.position.y = 0.295
     elif color == 'g':
-        block_pose.pose.position.x = 2
-        block_pose.pose.position.y = 2
+        block_pose.pose.position.x = 0.339
+        block_pose.pose.position.y = 0.460
     elif color == 'b':
-        block_pose.pose.position.x = 3
-        block_pose.pose.position.y = 3
+        block_pose.pose.position.x = 0.489
+        block_pose.pose.position.y = 0.295
     else:
         rospy.logerr('Unknown Color Type Selected')
     return  block_pose

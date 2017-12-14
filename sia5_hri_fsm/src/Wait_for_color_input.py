@@ -24,7 +24,7 @@ class HRI():
     serv = rospy.Service('sia5_hri_fsm/Pattern', sia5_hri_fsm.srv.Pattern, self.current_pattern)
 
     while not rospy.is_shutdown():
-      #rospy.sleep(10.0)
+      #rospy.Duration(1.0)
       print('---------------------------------------------------------------')
       print('Please enter the first letter(s) (lower-case) of the color block(s) you placed in order and then press enter:')
       print('Red = r, Yellow = y, Green = g, Blue = b')
@@ -36,7 +36,7 @@ class HRI():
 
   def current_pattern(self, req):
     print('service called')
-    print(self.pattern_str)
+    rospy.logwarn('Current pattern is: ' + self.pattern_str)
     return self.pattern_str
 
 if __name__ == '__main__':

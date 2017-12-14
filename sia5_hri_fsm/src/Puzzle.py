@@ -64,6 +64,7 @@ def next_block(rand, possible_patterns, current_pattern, num_tries=None):
         Input: possible_patterns (string array), current_pattern (string)
         Output: block which should be tried next
     """
+    rospy.logerr(rand)
     if rand:
         colors = ['r', 'y', 'g', 'b']
         return random.choice(colors)

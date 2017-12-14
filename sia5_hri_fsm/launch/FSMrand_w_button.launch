@@ -2,7 +2,7 @@
     <node
         name    = "FSM"
         pkg     = "sia5_hri_fsm"
-        type    = "FSM.py"
+        type    = "FSM_rand.py"
         args    = ""
 
         respawn = "false"

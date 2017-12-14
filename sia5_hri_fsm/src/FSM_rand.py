@@ -65,7 +65,7 @@ class ExaminePuzzle(smach.State):
                              outcomes=['give_next_block'],
                              input_keys=['pattern'],
                              output_keys=['next_block'])
-        self.rand = False
+        self.rand = True
         self.numerrguess = 0
         self.possible_patterns = []
         self.possible_patterns = create_patterns()
@@ -78,6 +78,7 @@ class ExaminePuzzle(smach.State):
         if not self.is_pattern_known:
             self.possible_patterns = compare_pattern(current_pattern, self.possible_patterns)
             num_solns = len(self.possible_patterns)
+            rospy.logerr('Passed rand is: ' + str(self.rand))
             if num_solns == 1:
                 rospy.loginfo('Pattern Discovered!')
                 self.is_pattern_known = True

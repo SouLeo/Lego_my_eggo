@@ -47,6 +47,8 @@ class Observe(smach.State):
             rospy.loginfo('Timeout Occurred')
         else:
             rospy.loginfo('Block in place')
+        global SM
+        SM.userdata.sm_is_block_placed = False
         return 'trigger_pattern'
 
 class ExaminePuzzle(smach.State):
@@ -60,7 +62,7 @@ class ExaminePuzzle(smach.State):
                              outcomes=['give_next_block'],
                              input_keys=['pattern'],
                              output_keys=['next_block'])
-        self.rand = True
+        self.rand = False
         self.numerrguess = 0
         self.possible_patterns = []
         self.possible_patterns = create_patterns()
@@ -97,7 +99,7 @@ class GiveBlock(smach.State):
         smach.State.__init__(self,
                              outcomes=['observe', 'trigger_handover'],
                              input_keys=['next_block'],
-                             output_keys=['is_block_placed_in'])
+                             output_keys=['tempPose'])
         self.starter_patterns = ''
         self.starter_patterns = create_starter_patterns()
 
@@ -107,13 +109,13 @@ class GiveBlock(smach.State):
         if handover_block:
             rospy.loginfo('No action taken')
             self.starter_patterns = self.starter_patterns.replace(userdata.next_block, '')
-            userdata.is_block_placed_in = True
+            userdata.tempPose = None
             return 'observe'
         else:
-            block_pose = get_pose(userdata.next_block)
-            rospy.loginfo('Pose is ' + str(block_pose.pose.position.x) + ', '
-                          + str(block_pose.pose.position.y))
-            userdata.is_block_placed_in = False
+            tempPose = get_pose(userdata.next_block)
+            rospy.loginfo('Pose is ' + str(tempPose.pose.position.x) + ', '
+                          + str(tempPose.pose.position.y))
+            userdata.tempPose = tempPose
             return 'trigger_handover'
 
 def is_block_placed_cb(data):
@@ -162,16 +164,14 @@ def main():
                                           'is_block_placed_in':'sm_is_block_placed'})
         smach.StateMachine.add('TRIGGERHANDOVER', ServiceState('sia5_hri_fsm/Handover',
                                                                sia5_hri_fsm.srv.Handover,
-                                                               request_slots=['block_pose'],
-                                                               response_slots=['handover_bool'],
-                                                               outcomes=['observe']),
-                               transitions={'observe':'OBSERVE'})
+                                                               request_slots=['tempPose'],
+                                                               response_slots=['handover_bool']),
+                               transitions={'succeeded':'OBSERVE'})
         smach.StateMachine.add('TRIGGERPATTERNSTATUS', ServiceState('sia5_hri_fsm/Pattern',
                                                                sia5_hri_fsm.srv.Pattern,
-                                                               request_slots=[''],
-                                                               response_slots=['pattern'],
-                                                               outcomes=['examine_puzzle']),
-                               transitions={'examine_puzzle':'EXAMINEPUZZLE'})
+                                                               request_slots=[],
+                                                               response_slots=['pattern']),
+                               transitions={'succeeded':'EXAMINEPUZZLE'})
     sis = smach_ros.IntrospectionServer('sia5_fsm', SM, '/SM_ROOT')
     sis.start()
     SM.execute()

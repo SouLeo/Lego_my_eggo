@@ -41,6 +41,7 @@ private:
   ros::Publisher markerPub;
   std::vector<double> bowlPos;
   tf::TransformBroadcaster broadcaster;
+  tf::TransformListener tf_listener;
 
   // Gripper functions
   void activateGripper();
@@ -57,6 +58,8 @@ private:
   void showArrow(geometry_msgs::PoseStamped tempPose);
   void publishPoseAsTransform(geometry_msgs::PoseStamped tempPose,
     std::string frame_name);
+
+  // Pose class variable
   geometry_msgs::PoseStamped lego_pose_;
 };
 

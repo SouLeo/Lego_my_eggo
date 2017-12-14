@@ -63,7 +63,7 @@ void MoveDown::run() // where the code actually runs
 
   bool handover_bool = false;
   // Set moves to half speed 
-  mi->setVelocityScaling(0.3);
+  mi->setVelocityScaling(1.0);
   gi->setSpeed(0);
   gi->setForce(40);
   activateGripper();
@@ -102,13 +102,13 @@ void MoveDown::run() // where the code actually runs
 //   double zz = 0.0;
 
 // green block
-  double x = 0.339;
-  double y = 0.460;
-  double z = 0.17;
-  double ww = 0.0;
-  double xx = 0.964;
-  double yy = -0.267;
-  double zz = 0.0;
+//  double x = 0.339;
+//  double y = 0.460;
+//  double z = 0.17;
+//  double ww = 0.0;
+//  double xx = 0.964;
+//  double yy = -0.267;
+//  double zz = 0.0;
 
 
   // moveToPose(x,
@@ -119,24 +119,28 @@ void MoveDown::run() // where the code actually runs
   //            zz);
   // ros::Duration(0.3).sleep();
 
-  geometry_msgs::Pose ref = createPose(x, y, z,
-    ww, xx, yy, zz);
+//  geometry_msgs::Pose ref = createPose(x, y, z,
+//    ww, xx, yy, zz);
 
 
-  geometry_msgs::PoseStamped posey_pose;
+//  geometry_msgs::PoseStamped posey_pose;
 
-  posey_pose.pose = ref;
-  posey_pose.header.frame_id = "world";
+//  posey_pose.pose = ref;
+//  posey_pose.header.frame_id = "world";
 
   // publishPoseAsTransform(posey_pose,"target pose");
   
   // showArrow(posey_pose);
 
-  mi->moveArm(lego_pose_, 1.0, false);
+  tf_listener.waitForTransform("/world", "/base_link", ros::Time::now(), ros::Duration(3.0));
 
-  lego_pose_.pose.position.z = 0.11;
+  mi->moveArm(lego_pose_, 1.0, false);
+  ROS_INFO_STREAM("Successfully moved arm to hover position");
+
+  lego_pose_.pose.position.z = 0.11-0.088;
 
   mi->moveCart(lego_pose_, 1.0, false);
+  ROS_INFO_STREAM("Successfully moved arm to grasp position");
 
   // moveToPose(x,
   //          y,
@@ -145,8 +149,9 @@ void MoveDown::run() // where the code actually runs
   //          yy,
   //          zz);
   closeGripper();
+  ROS_INFO_STREAM("Successfully grasped");
 
-  lego_pose_.pose.position.z = 0.20;
+  lego_pose_.pose.position.z = 0.40;
 
   mi->moveCart(lego_pose_, 1.0, false);
 

@@ -9,7 +9,6 @@ class HRI():
 
   # Initialize the output string of block colors
   pattern_str = ''
-  output_str = ''
 
   def __init__(self):
     """
@@ -31,14 +30,14 @@ class HRI():
       print('Red = r, Yellow = y, Green = g, Blue = b')
       print('Example: One red block = r, A blue and yellow = by')
       text = raw_input()
-      self.output_str = self.pattern_str + text
+      self.pattern_str = self.pattern_str + text
       # Ready to output this string to the service or topic
       pub.publish(True)
 
   def current_pattern(self, req):
     print('service called')
-    print(self.output_str)
-    return self.output_str
+    print(self.pattern_str)
+    return self.pattern_str
 
 if __name__ == '__main__':
     HRI = HRI()
